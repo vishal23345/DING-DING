@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App with Loading Screen</title>
+    <style>
+        /* Loading Animation Styles (Cloud) */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loader-container.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader .cloud {
+            font-size: 80px;
+            color: #fff;
+            animation: cloudFloat 2s infinite ease-in-out;
+            position: relative;
+        }
+
+        @keyframes cloudFloat {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* Weather App Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+        }
+        
+        .weather-card {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            width: 350px;
+            animation: slideIn 1s ease-out;
+            position: relative;
+            overflow: hidden;
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+        
+        .weather-card.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .weather-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        .input-group button {
+            padding: 12px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .input-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .weather-info {
+            margin-top: 25px;
+            border-top: 2px solid #eee;
+            padding-top: 25px;
+        }
+
+        .weather-info h2 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 28px;
+            font-weight: 500;
+        }
+
+        .weather-info .icon {
+            font-size: 50px;
+            color: #ffc107;
+            margin-bottom: 10px;
+        }
+
+        .weather-info p {
+            color: #777;
+            margin: 8px 0;
+            font-size: 18px;
+        }
+
+        .weather-info .temp {
+            font-size: 48px;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader" class="loader-container">
+        <div class="loader">
+            <div class="cloud">☁️</div>
+        </div>
+    </div>
+
+    <div id="mainContent" class="weather-card">
+        <h1>Static Weather App</h1>
+        <div class="input-group">
+            <input type="text" id="city-input" placeholder="Enter city name">
+            <button id="button">Get Weather</button>
+        </div>
+        <div class="weather-info" id="weather-display">
+            <div class="icon">🌤️</div>
+            <h2 id="city">New York, NY</h2>
+            <p class="temp">22°C</p>
+            <p id="Condition">Condition: Sunny</p>
+            <p id="Humidity">Humidity: 65%</p>
+            <p id="Wind">Wind: 10 km/h</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loader = document.getElementById('loader');
+            const mainContent = document.getElementById('mainContent');
+            
+            // Wait for a short duration to let the animation play
+            setTimeout(() => {
+                // Add the 'hidden' class to the loader to trigger the fade-out
+                loader.classList.add('hidden');
+                
+                // After the fade-out transition, make the content visible
+                loader.addEventListener('transitionend', () => {
+                    mainContent.classList.add('visible');
+                });
+            }, 2500); // 2.5-second delay before starting the fade-out
+        });
+
+        const cityInput = document.getElementById('city-input');
+        const icon = document.querySelector('.icon');
+        const city = document.getElementById('city');
+        const temp = document.querySelector('.temp');
+        const Condition = document.getElementById('Condition');
+        const Humidity = document.getElementById('Humidity');
+        const Wind = document.getElementById('Wind');
+        const button = document.getElementById('button');
+        
+        const weather = async () => {
+            const cityName = cityInput.value.trim() || "New York";
+            const api = `http://api.weatherapi.com/v1/current.json?key=1db6204e3bcb4369a4675545252401&q=${encodeURIComponent(cityName)}&aqi=yes`;
+            try {
+                const data = await fetch(api);
+                const result = await data.json();
+                if (result && result.current) {
+                    temp.innerHTML = `${result.current.temp_c}°C`;
+                    city.innerHTML = `${result.location.name}, ${result.location.region}`;
+                    Condition.innerHTML = `Condition: ${result.current.condition.text}`;
+                    Humidity.innerHTML = `Humidity: ${result.current.humidity}%`;
+                    Wind.innerHTML = `Wind: ${result.current.wind_kph} km/h`;
+                    icon.innerHTML = `<img src="https:${result.current.condition.icon}" alt="${result.current.condition.text}" />`;
+                } else {
+                    temp.innerHTML = `N/A`;
+                    city.innerHTML = `City not found`;
+                    Condition.innerHTML = `Condition: N/A`;
+                    Humidity.innerHTML = `Humidity: N/A`;
+                    Wind.innerHTML = `Wind: N/A`;
+                    icon.innerHTML = `❓`;
+                }
+            } catch (error) {
+                temp.innerHTML = `N/A`;
+                city.innerHTML = `Error fetching data`;
+                Condition.innerHTML = `Condition: N/A`;
+                Humidity.innerHTML = `Humidity: N/A`;
+                Wind.innerHTML = `Wind: N/A`;
+                icon.innerHTML = `❓`;
+                console.error(error);
+            }
+        };
+
+        button.addEventListener('click', weather);
+    </script>
+</body>
+</html>
