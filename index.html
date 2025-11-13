@@ -216,7 +216,7 @@
         
         const weather = async () => {
             const cityName = cityInput.value.trim() || "New York";
-            const api = `http://api.weatherapi.com/v1/current.json?key=1db6204e3bcb4369a4675545252401&q=${encodeURIComponent(cityName)}&aqi=yes`;
+            const api = `http://api.weatherapi.com/v1/current.json?key=a935d52a16344e66a3b72934251311&q=${encodeURIComponent(cityName)}&aqi=yes`;
             try {
                 const data = await fetch(api);
                 const result = await data.json();
@@ -249,4 +249,5 @@
         button.addEventListener('click', weather);
     </script>
 </body>
+
 </html>
